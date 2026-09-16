@@ -1,11 +1,26 @@
 # 🧠 RAG-X — Phase 1
 
-## Advanced RAG Learning & Experimentation Laboratory
+## Advanced RAG Learning & Experimentation Platform
 
-Phase 1 establishes a transparent RAG baseline:
+This version is intentionally reduced to **only three files** so it can be pasted directly into a GitHub repository and deployed on Streamlit.
 
 ```text
-Websites / Documents
+rag-x/
+├── source.py
+├── requirements.txt
+└── README.md
+```
+
+No additional Python modules are required.
+
+---
+
+# 1. What Phase 1 does
+
+RAG-X Phase 1 builds a transparent baseline RAG pipeline:
+
+```text
+Website / Documents
         ↓
    Text Extraction
         ↓
@@ -18,91 +33,135 @@ Vector BM25   Hybrid
         ↓
  Retrieved Evidence
         ↓
-   Grok 4.6 LLM
+      Grok 4.6
         ↓
  Grounded Answer
+        ↓
+    [Source N]
 ```
 
-The project is intentionally modular. Future phases will add advanced RAG techniques one by one and show the user the actual before/after results.
+The purpose is to understand **how RAG works**, not just build a chatbot.
 
 ---
 
-# 1. Phase 1 capabilities
+# 2. Three files
 
-## Website RAG
+## source.py
 
-Enter at least two public URLs.
+Contains the complete application:
 
-Recommended initial test:
+- Streamlit UI
+- Website ingestion
+- Document ingestion
+- PDF parser
+- DOCX parser
+- PPTX parser
+- XLSX/XLSM parser
+- TXT/Markdown parser
+- CSV parser
+- JSON parser
+- HTML parser
+- Chunking
+- TF-IDF vector retrieval
+- BM25 retrieval
+- Hybrid retrieval
+- Retrieval Inspector
+- Grok 4.6 generation
+- Grounded-answer prompt
+- Source/evidence display
+
+## requirements.txt
+
+Contains all Python dependencies.
+
+## README.md
+
+Contains installation, configuration, deployment and learning instructions.
+
+---
+
+# 3. Supported document formats
+
+Phase 1 supports:
+
+```text
+PDF
+DOCX
+PPTX
+XLSX
+XLSM
+TXT
+MD
+CSV
+JSON
+HTML
+HTM
+```
+
+The uploader accepts files, but unsupported formats are explicitly rejected because a reliable parser is required for each format.
+
+More document loaders can be added in later phases.
+
+---
+
+# 4. Website RAG
+
+The application can ingest public web pages.
+
+The default examples are:
 
 ```text
 https://docs.streamlit.io/
 https://docs.python.org/3/
 ```
 
-The application downloads the HTML, removes scripts/styles, extracts readable text and turns the pages into RAG sources.
+Use at least two URLs for the initial experiment.
 
-## Document RAG
+The application:
 
-Supported Phase 1 formats:
-
-- PDF
-- DOCX
-- PPTX
-- XLSX / XLSM
-- TXT
-- Markdown
-- CSV
-- JSON
-- HTML / HTM
-
-The uploader accepts any extension, but the parser intentionally supports a defined set. Unsupported formats are reported rather than silently creating bad text.
+```text
+URL
+ ↓
+HTTP GET
+ ↓
+HTML
+ ↓
+Remove scripts/styles
+ ↓
+Extract text
+ ↓
+Chunk
+ ↓
+Index
+```
 
 ---
 
-# 2. Grok LLM
+# 5. Grok 4.6
 
-RAG-X Phase 1 uses **xAI Grok** for generation.
+RAG-X uses xAI Grok for the generation layer.
 
-Current default:
+Default model:
 
 ```text
 grok-4.6
 ```
 
-xAI currently documents `grok-4.6` as its flagship model for coding, agentic tasks and knowledge work. The model supports a 500k-token context window and both Responses API and Chat Completions. 
+xAI's current documentation identifies Grok 4.6 as its flagship model for general knowledge work, coding and agentic tasks.
 
-RAG-X uses the OpenAI-compatible xAI endpoint:
+The xAI OpenAI-compatible API endpoint used by this application is:
 
 ```text
 https://api.x.ai/v1
 ```
 
-The model is configurable through:
-
-```text
-XAI_MODEL
-```
-
-Default:
-
-```text
-grok-4.6
-```
-
-This means we can update the model later without changing the RAG architecture.
+The code keeps the Grok integration centralized inside `source.py`, so a future model change does not require changing the RAG architecture.
 
 ---
 
-# 3. Configure Grok locally
+# 6. Streamlit Secrets
 
-Create:
-
-```text
-.streamlit/secrets.toml
-```
-
-Add:
+For Streamlit Cloud, open the application's **Secrets** settings and add:
 
 ```toml
 XAI_API_KEY = "your-xai-api-key"
@@ -110,27 +169,24 @@ XAI_MODEL = "grok-4.6"
 XAI_BASE_URL = "https://api.x.ai/v1"
 ```
 
-Do NOT commit this file.
+Do not put the real API key into GitHub.
 
-The repository contains:
-
-```text
-.streamlit/secrets.toml.example
-```
-
-as a safe template.
-
-For local execution, Streamlit exposes secrets through its secrets/environment mechanism. The application expects `XAI_API_KEY` to be available.
+Do not commit a secrets file containing the real key.
 
 ---
 
-# 4. Install
+# 7. Local installation
 
-Python 3.12 is recommended.
+Clone your repository:
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone YOUR_GITHUB_REPOSITORY
 cd rag-x
+```
+
+Create a virtual environment:
+
+```bash
 python -m venv .venv
 ```
 
@@ -155,14 +211,14 @@ pip install -r requirements.txt
 Run:
 
 ```bash
-streamlit run streamlit_app.py
+streamlit run source.py
 ```
 
 ---
 
-# 5. First experiment
+# 8. First experiment
 
-## Step 1 — Add websites
+## Step 1 — Load websites
 
 Open:
 
@@ -185,7 +241,9 @@ Load Website Sources
 
 You should see both sources.
 
-## Step 2 — Build index
+---
+
+## Step 2 — Build the index
 
 Open:
 
@@ -199,7 +257,21 @@ Click:
 Build / Rebuild Index
 ```
 
-## Step 3 — Compare retrieval
+The application will:
+
+```text
+Documents
+   ↓
+Chunks
+   ↓
+TF-IDF index
+   +
+BM25 index
+```
+
+---
+
+# 9. Test retrieval
 
 Open:
 
@@ -207,13 +279,13 @@ Open:
 🔎 Retrieval Inspector
 ```
 
-Ask:
+Try:
 
 ```text
 What is Streamlit Community Cloud?
 ```
 
-Run:
+Run the same query using:
 
 ```text
 Vector
@@ -221,9 +293,20 @@ BM25
 Hybrid
 ```
 
-Inspect the actual retrieved chunks.
+Look at:
 
-## Step 4 — Ask Grok
+- returned chunks
+- ranking
+- retrieval score
+- source
+- source URL
+- actual evidence
+
+This is an important part of learning RAG.
+
+---
+
+# 10. Ask Grok
 
 Open:
 
@@ -234,126 +317,214 @@ Open:
 Ask:
 
 ```text
-What is Streamlit Community Cloud and how is it deployed?
+What is Streamlit Community Cloud?
 ```
 
-The flow is:
+The application performs:
 
 ```text
-Question
-   ↓
-Hybrid retrieval
-   ↓
-Top-K evidence
-   ↓
+User Question
+      ↓
+Hybrid Retrieval
+      ↓
+Top-K Chunks
+      ↓
+Evidence
+      ↓
 Grok 4.6
-   ↓
-Grounded answer
+      ↓
+Grounded Answer
 ```
 
-Grok is instructed to answer only from the supplied evidence and cite it as `[Source N]`.
+Grok is instructed:
+
+- answer only from retrieved evidence
+- do not invent facts
+- state when evidence is insufficient
+- cite evidence using `[Source N]`
 
 ---
 
-# 6. Important Phase 1 architecture decision
+# 11. Why Phase 1 uses TF-IDF instead of embeddings
 
-Grok is deliberately isolated:
+This is intentional.
+
+We want the first RAG experiment to make retrieval behavior easy to understand.
+
+Phase 1:
 
 ```text
-app/
-├── retrieval.py
-├── chunking.py
-├── loaders/
+TF-IDF
++
+BM25
++
+Hybrid
+```
+
+Later:
+
+```text
+Phase 3
+    ↓
+Real Embeddings
+    ↓
+Semantic Vector Search
+```
+
+This lets us compare:
+
+```text
+Keyword Search
+       vs
+Semantic Search
+       vs
+Hybrid Search
+```
+
+and actually see the difference.
+
+---
+
+# 12. Advanced RAG roadmap
+
+RAG-X will evolve from the Phase 1 baseline.
+
+```text
+Phase 1  Foundation + Baseline RAG
+Phase 2  Advanced Chunking
+Phase 3  Embedding Experiments
+Phase 4  Hybrid Retrieval
+Phase 5  Query Rewriting
+Phase 6  Multi-Query
+Phase 7  Query Decomposition
+Phase 8  HyDE
+Phase 9  Reranking
+Phase 10 Parent-Child Retrieval
+Phase 11 Contextual Retrieval
+Phase 12 Metadata Filtering
+Phase 13 Context Compression
+Phase 14 Query Routing
+Phase 15 Graph RAG
+Phase 16 Agentic RAG
+Phase 17 Self-RAG
+Phase 18 Corrective RAG
+Phase 19 RAG Evaluation
+Phase 20 Experiment Dashboard
+```
+
+---
+
+# 13. Learning method
+
+For every new technique we should follow:
+
+```text
+1. Understand the concept
+        ↓
+2. Run Phase 1 baseline
+        ↓
+3. Implement the new technique
+        ↓
+4. Run the same query/test
+        ↓
+5. Compare results
+        ↓
+6. Measure metrics
+        ↓
+7. Understand why it improved
+        ↓
+8. Understand trade-offs
+```
+
+Example:
+
+```text
+Baseline Chunking
+       ↓
+Question
+       ↓
+Retrieved Evidence
+       ↓
+Result
+
+        VS
+
+Semantic Chunking
+       ↓
+Same Question
+       ↓
+Retrieved Evidence
+       ↓
+Result
+```
+
+The objective is to see **what the advanced technique actually changes**.
+
+---
+
+# 14. Important security note
+
+For a public GitHub/Streamlit Cloud project:
+
+Use:
+
+- public documentation
+- RFCs
+- synthetic network data
+- sanitized incident reports
+- public technical documents
+
+Do not upload confidential:
+
+- NOC configurations
+- customer information
+- passwords
+- API keys
+- private IP/network information
+- internal incident reports
+
+For your real telecom/NOC environment, a later version can be designed as an **offline/on-premises RAG + local LLM** system.
+
+---
+
+# 15. GitHub structure
+
+Your repository should contain exactly:
+
+```text
+rag-x/
 │
-└── llm/
-    └── grok.py
+├── source.py
+├── requirements.txt
+└── README.md
 ```
 
-This is important because future modules can call Grok without putting model-specific code inside every module.
-
-For example:
+Then Streamlit uses:
 
 ```text
-Query Rewriting
-       ↓
-     Grok
-       ↓
-Rewritten query
+source.py
 ```
 
-```text
-Query Decomposition
-       ↓
-     Grok
-       ↓
-Q1 / Q2 / Q3
-```
-
-```text
-Agentic RAG
-       ↓
-     Grok
-       ↓
-Plan → Retrieve → Evaluate → Retrieve
-```
+as the main application file.
 
 ---
 
-# 7. Future RAG-X architecture
+# 16. Streamlit deployment
 
-```text
-                    ┌─────────────┐
-                    │    Grok     │
-                    │   4.6       │
-                    └──────┬──────┘
-                           │
-             ┌─────────────┼──────────────┐
-             ↓             ↓              ↓
-       Query Rewrite   Decomposition   Agent
-             │             │              │
-             └─────────────┼──────────────┘
-                           ↓
-                    Retrieval Layer
-                           │
-                ┌──────────┼──────────┐
-                ↓          ↓          ↓
-             Vector       BM25      Graph
-                └──────────┼──────────┘
-                           ↓
-                       Reranker
-                           ↓
-                  Context Management
-                           ↓
-                         Grok
-                           ↓
-                  Grounded Answer
-                           ↓
-                      Evaluation
-```
-
----
-
-# 8. Streamlit Cloud deployment
-
-Push the project to GitHub.
-
-Then create a Streamlit Community Cloud application using:
+When creating the Streamlit application:
 
 ```text
 Repository:
 YOUR_USERNAME/rag-x
 
+Branch:
+main
+
 Main file:
-streamlit_app.py
+source.py
 ```
 
-The repository already contains:
-
-```text
-requirements.txt
-```
-
-For deployment, configure the secret:
+Then configure the Streamlit Secrets:
 
 ```toml
 XAI_API_KEY = "your-xai-api-key"
@@ -361,54 +532,24 @@ XAI_MODEL = "grok-4.6"
 XAI_BASE_URL = "https://api.x.ai/v1"
 ```
 
-Do this through the Streamlit Cloud Secrets interface rather than committing the key.
-
-The application should use public/sanitized RAG data.
+No other application files are required.
 
 ---
 
-# 9. Security
+# 17. Phase 1 success criteria
 
-Never put this in GitHub:
+Phase 1 is considered complete when you can:
 
-```text
-XAI_API_KEY = "real-key"
-```
+- load two websites
+- upload supported documents
+- build chunks
+- build the index
+- run Vector retrieval
+- run BM25 retrieval
+- run Hybrid retrieval
+- inspect retrieved evidence
+- send retrieved evidence to Grok 4.6
+- receive a grounded answer
+- see `[Source N]` citations
 
-Never commit:
-
-```text
-.streamlit/secrets.toml
-```
-
-Never use real confidential NOC data in the public Streamlit deployment.
-
-For your telecom learning dataset, use:
-
-- public vendor documentation
-- RFCs
-- sanitized incident reports
-- synthetic network data
-- publicly available technical documentation
-
----
-
-# 10. What we learn in Phase 1
-
-By completing Phase 1, you should understand:
-
-1. Document ingestion
-2. Website ingestion
-3. Text extraction
-4. Chunking
-5. Vector retrieval
-6. BM25
-7. Hybrid retrieval
-8. Top-K
-9. Retrieval scores
-10. Evidence inspection
-11. Grounded generation
-12. Citation handling
-13. Separation between retrieval and LLM generation
-
-After this baseline is verified, Phase 2 will introduce the next RAG technique while keeping the Phase 1 baseline available for comparison.
+After that, we can start **Phase 2 — Advanced Chunking** and keep this Phase 1 implementation as the baseline.
