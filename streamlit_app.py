@@ -54,6 +54,15 @@ from sklearn.preprocessing import normalize
 # Configuration
 # ============================================================
 
+# ============================================================
+# GROK CONFIGURATION
+# ============================================================
+# Add this in Streamlit Cloud -> Settings -> Secrets:
+#
+# GROK_API_KEY = "xai-xxxxxxxxxxxxxxxx"
+#
+# The API key is intentionally NOT stored in this source file.
+
 DEFAULT_GROK_MODEL = "grok-4.6"
 DEFAULT_XAI_BASE_URL = "https://api.x.ai/v1"
 
@@ -103,7 +112,6 @@ class Chunk:
 def get_secret_or_env(name: str, default: str | None = None) -> str | None:
     """
     Read configuration from Streamlit Secrets first, then environment.
-    This allows the same code to work locally and on Streamlit Cloud.
     """
     try:
         value = st.secrets.get(name)
@@ -878,13 +886,13 @@ class RetrievalIndex:
 
 def get_grok_client() -> OpenAI:
     api_key = get_secret_or_env(
-        "XAI_API_KEY"
+        "GROK_API_KEY"
     )
 
     if not api_key:
         raise RuntimeError(
-            "XAI_API_KEY is not configured. "
-            "Add it in Streamlit Secrets."
+            "GROK_API_KEY is not configured. "
+            "Add GROK_API_KEY in Streamlit Secrets."
         )
 
     return OpenAI(
@@ -1087,13 +1095,13 @@ def main() -> None:
             f"API: {get_xai_base_url()}"
         )
 
-        if get_secret_or_env("XAI_API_KEY"):
+        if get_secret_or_env("GROK_API_KEY"):
             st.success(
-                "XAI_API_KEY detected"
+                "GROK_API_KEY detected"
             )
         else:
             st.warning(
-                "XAI_API_KEY not detected"
+                "GROK_API_KEY not detected"
             )
 
     # --------------------------------------------------------
@@ -1474,11 +1482,11 @@ def main() -> None:
                 st.session_state.last_method = "Hybrid"
 
                 if not get_secret_or_env(
-                    "XAI_API_KEY"
+                    "GROK_API_KEY"
                 ):
                     st.error(
-                        "XAI_API_KEY is not configured. "
-                        "Add it in Streamlit Secrets."
+                        "GROK_API_KEY is not configured. "
+                        "Add GROK_API_KEY in Streamlit Secrets."
                     )
                 else:
                     try:
