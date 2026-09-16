@@ -108,14 +108,14 @@ More document loaders can be added in later phases.
 
 The application can ingest public web pages.
 
-The default examples are:
+The default examples are (you may use one, both, or replace them):
 
 ```text
 https://docs.streamlit.io/
 https://docs.python.org/3/
 ```
 
-Use at least two URLs for the initial experiment.
+Use one URL or multiple URLs for the initial experiment.
 
 The application:
 
