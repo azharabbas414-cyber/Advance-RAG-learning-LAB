@@ -468,6 +468,24 @@ def load_url(
         },
     )
 
+    if response.status_code == 403:
+        raise ValueError(
+            "HTTP 403 Forbidden — the website is blocking automated "
+            "requests. Try another accessible page or download the "
+            "documentation and upload the PDF/document instead."
+        )
+
+    if response.status_code == 401:
+        raise ValueError(
+            "HTTP 401 Unauthorized — this page requires authentication."
+        )
+
+    if response.status_code == 429:
+        raise ValueError(
+            "HTTP 429 Too Many Requests — the website is rate limiting "
+            "automated requests. Try again later."
+        )
+
     response.raise_for_status()
 
     soup = BeautifulSoup(
@@ -1099,17 +1117,18 @@ def main() -> None:
         st.subheader("Website RAG")
 
         st.info(
-            "Enter at least two public URLs for the initial "
-            "website-RAG experiment."
+            "Add one or more public website URLs. "
+            "You can start with a single URL or add multiple URLs "
+            "for a larger RAG knowledge base."
         )
 
         urls_text = st.text_area(
-            "Website URLs — one per line",
+            "Website URLs — one or more, one per line",
             value=(
                 "https://docs.streamlit.io/\n"
                 "https://docs.python.org/3/"
             ),
-            height=100,
+            height=120,
         )
 
         if st.button(
@@ -1122,29 +1141,58 @@ def main() -> None:
                 if url.strip()
             ]
 
-            if len(urls) < 2:
+            if not urls:
                 st.error(
-                    "Please provide at least 2 URLs."
+                    "Please enter at least one URL."
                 )
             else:
-                try:
-                    with st.spinner(
-                        "Downloading and extracting websites..."
-                    ):
-                        documents = load_urls(urls)
+                successful_documents = []
+                failed_urls = []
 
+                progress = st.progress(
+                    0,
+                    text="Starting website ingestion..."
+                )
+
+                for number, url in enumerate(urls, start=1):
+                    try:
+                        document = load_url(url)
+                        successful_documents.append(document)
+
+                    except Exception as exc:
+                        failed_urls.append(
+                            {
+                                "url": url,
+                                "error": str(exc),
+                            }
+                        )
+
+                    progress.progress(
+                        number / len(urls),
+                        text=f"Processed {number}/{len(urls)} URL(s)"
+                    )
+
+                progress.empty()
+
+                if successful_documents:
                     st.session_state.documents.extend(
-                        documents
+                        successful_documents
                     )
 
                     st.success(
-                        f"Loaded {len(documents)} website source(s)."
+                        f"Loaded {len(successful_documents)} "
+                        f"website source(s)."
                     )
 
-                except Exception as exc:
-                    st.error(
-                        f"Website ingestion failed: {exc}"
+                if failed_urls:
+                    st.warning(
+                        f"{len(failed_urls)} URL(s) could not be loaded."
                     )
+
+                    for failure in failed_urls:
+                        st.error(
+                            f"{failure['url']} — {failure['error']}"
+                        )
 
         st.divider()
 
