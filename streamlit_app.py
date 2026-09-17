@@ -16,9 +16,9 @@ Features:
 - No external application modules required
 
 Streamlit Secrets:
-    XAI_API_KEY = "your-xai-api-key"
-    XAI_MODEL = "grok-4.6"
-    XAI_BASE_URL = "https://api.x.ai/v1"
+    GROK_API_KEY = "your-xai-api-key"
+    GROK_MODEL = "grok-4.6"
+    GROK_BASE_URL = "https://api.x.ai/v1"
 
 Run:
     streamlit run source.py
